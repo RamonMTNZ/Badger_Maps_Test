@@ -122,20 +122,35 @@ class process_dataframe():
 # order and return array
 
 # Method to sort dataframe by date
-# sort dataframe by date
-# return dataframe
+    def sort_by_dob(self, dataframe):
+        # sort dataframe by date
+        dataframe["Last Check-In Date"] = pd.to_datetime(dataframe["Last Check-In Date"], dayfirst=True)
+        dataframe.sort_values(by='Last Check-In Date', inplace=True)
+        # return dataframe
+        return dataframe
 
 # Method to get customer with latest check-in date
-# call method to sort dataframe by date
-# return last item
+    def get_customer_last_checkin_date(self, dataframe):
+        # call method to sort dataframe by date
+        dataframe = process_dataframe().sort_by_dob(dataframe)
+        # return last item
+        return dataframe.iloc[-1,:]
+
 
 # Method to get customer with earliest check-in date
-# call method to sort dataframe by date
-# return last item
+    def get_customer_first_checkin_date(self, dataframe):
+        # call method to sort dataframe by date
+        dataframe = process_dataframe().sort_by_dob(dataframe)
+        # return first item
+        return dataframe.iloc[0, :]
 
 a = process_dataframe()
 
 # read dataframe
 dataframe = a.initialise_dataframe()
 
-print(dataframe)
+# Get first and latest clients to check-in
+print("-------Latest customer to check-in: ------- ")
+print(a.get_customer_last_checkin_date(dataframe))
+print("-------First customer to check-in: -------")
+print(a.get_customer_first_checkin_date(dataframe))
