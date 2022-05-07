@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import errors
 from natsort import humansorted, ns_enum, ns
+import locale
 
 
 
@@ -127,7 +128,8 @@ class process_dataframe():
         for index in range(len(names)):
             full_names.append(str(names[index]) + " " + str(surnames[index]))
         # order and return array
-        full_names = humansorted(full_names,alg=ns.REAL | ns.LOCALE | ns.IGNORECASE)
+        locale.setlocale(locale.LC_ALL, "")
+        full_names.sort(key=locale.strxfrm)
         return full_names
 
 # Method to sort dataframe by date
