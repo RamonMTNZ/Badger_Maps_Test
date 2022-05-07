@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import errors
+from natsort import humansorted, ns_enum, ns
 
 
 
@@ -17,7 +18,7 @@ class process_dataframe():
         process_dataframe().check_empty_fields(data)
         # Give user the option to call the method to delete problem rows, if any.
         if len(self.fields_to_delete):
-            data = a.delete_rows(data)
+            data = process_df.delete_rows(data)
         return data
 
     # method to read data
@@ -31,9 +32,7 @@ class process_dataframe():
         # Check that all required fields are filled out, if not list the rows that aren't
         rows_without_required_fields = []
         for field in self.required_fields:
-            a = np.where(dataframe[field].isnull())[0]
-            for item in a:
-                rows_without_required_fields.append(item)
+            rows_without_required_fields = np.where(dataframe[field].isnull())[0]
 
         # if any rows have empty required fields, raise exception
         needs_fixing = False
@@ -117,9 +116,19 @@ class process_dataframe():
         return dataframe
 
 # Method to obtain list of names alphabetically
-# Slice dataframe so that it's only first and last names
-# join these in a new array
-# order and return array
+    def get_list_of_names_alphabetically(self, dataframe):
+        # Slice dataframe so that it's only first and last names
+        names =  dataframe.iloc[:,0]
+        surnames = dataframe.iloc[:,1]
+        names = names.values.tolist()
+        surnames = surnames.values.tolist()
+        full_names = []
+        # join these in a new array
+        for index in range(len(names)):
+            full_names.append(str(names[index]) + " " + str(surnames[index]))
+        # order and return array
+        full_names = humansorted(full_names,alg=ns.REAL | ns.LOCALE | ns.IGNORECASE)
+        return full_names
 
 # Method to sort dataframe by date
     def sort_by_dob(self, dataframe):
@@ -144,13 +153,17 @@ class process_dataframe():
         # return first item
         return dataframe.iloc[0, :]
 
-a = process_dataframe()
+process_df = process_dataframe()
 
 # read dataframe
-dataframe = a.initialise_dataframe()
+dataframe = process_df.initialise_dataframe()
+
+# Get list of clients in alphabetical order
+print("-------List of customers ordered alphabetically: -------")
+print(process_df.get_list_of_names_alphabetically(dataframe))
 
 # Get first and latest clients to check-in
 print("-------Latest customer to check-in: ------- ")
-print(a.get_customer_last_checkin_date(dataframe))
+print(process_df.get_customer_last_checkin_date(dataframe))
 print("-------First customer to check-in: -------")
-print(a.get_customer_first_checkin_date(dataframe))
+print(process_df.get_customer_first_checkin_date(dataframe))
